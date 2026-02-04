@@ -24,7 +24,6 @@ const CATEGORIAS = [
   "cerveja",
   "cocacola",
   "crianças",
-  "eletrônicos",
   "doces",
   "esporte",
   "fantasia",
