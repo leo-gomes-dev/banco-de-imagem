@@ -32,10 +32,8 @@ const CATEGORIAS = [
   "frango",
   "frutas e legumes",
   "hamburguer",
-  "heróis",
   "hot-dog",
   "celular",
-  "modelos",
   "natal",
   "natureza",
   "negócios",
@@ -55,7 +53,6 @@ export default function GaleriaAlunos() {
   const [categoria, setCategoria] = useState("all");
   const [loading, setLoading] = useState(true);
 
-  // Estados para Paginação
   const [nextCursor, setNextCursor] = useState<string | null>(null);
   const [cursorHistory, setCursorHistory] = useState<(string | null)[]>([]);
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -76,11 +73,12 @@ export default function GaleriaAlunos() {
       setFotos([]);
     } finally {
       setLoading(false);
-      window.scrollTo({ top: 0, behavior: "smooth" }); // Volta ao topo ao trocar página
+      if (typeof window !== "undefined") {
+        window.scrollTo({ top: 0, behavior: "smooth" });
+      }
     }
   };
 
-  // Resetar ao trocar categoria
   useEffect(() => {
     setCursorHistory([]);
     setCurrentIndex(0);
@@ -102,7 +100,7 @@ export default function GaleriaAlunos() {
     if (currentIndex > 0) {
       const prevCursor = cursorHistory[currentIndex - 1];
       const newHistory = [...cursorHistory];
-      newHistory.pop(); // Remove o último do histórico ao voltar
+      newHistory.pop();
       setCursorHistory(newHistory);
       setCurrentIndex((prev) => prev - 1);
       carregarImagens(prevCursor);
@@ -110,10 +108,17 @@ export default function GaleriaAlunos() {
   };
 
   const handleDownload = (url: string) => {
-    const downloadUrl = url.replace("/upload/", "/upload/fl_attachment/");
+    // 1. Remove otimizações de visualização para pegar o arquivo real
+    // 2. Converte a extensão para .png via URL do Cloudinary
+    // 3. Adiciona fl_attachment para forçar o download direto
+    const downloadUrl = url
+      .replace("/f_auto,q_auto/", "/")
+      .replace(/\.[^/.]+$/, ".png")
+      .replace("/upload/", "/upload/fl_attachment/");
+
     const link = document.createElement("a");
     link.href = downloadUrl;
-    link.setAttribute("download", "");
+    link.setAttribute("download", `recurso-${Date.now()}.png`);
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
@@ -125,11 +130,10 @@ export default function GaleriaAlunos() {
         <h1 className="text-3xl font-extrabold text-blue-900 mb-2">
           Banco de Imagens
         </h1>
-
-        <p className="text-gray-600">Página {currentIndex + 1}</p>
+        <p className="text-gray-500 text-sm">Página {currentIndex + 1}</p>
       </header>
 
-      {/* Categorias */}
+      {/* Navegação de Categorias */}
       <div className="flex gap-2 overflow-x-auto pb-6 mb-8 scrollbar-hide">
         {CATEGORIAS.map((cat) => (
           <button
@@ -137,8 +141,8 @@ export default function GaleriaAlunos() {
             onClick={() => setCategoria(cat)}
             className={`px-5 py-2 rounded-full capitalize whitespace-nowrap text-sm font-medium transition-all ${
               categoria === cat
-                ? "bg-blue-600 text-white shadow-lg"
-                : "bg-white text-gray-600 border border-gray-200"
+                ? "bg-blue-600 text-white shadow-md"
+                : "bg-white text-gray-500 border border-gray-200 hover:border-blue-300"
             }`}
           >
             {cat}
@@ -146,20 +150,20 @@ export default function GaleriaAlunos() {
         ))}
       </div>
 
-      {/* Grid */}
-      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 min-h-[400px]">
+      {/* Grid de Imagens */}
+      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 min-h-[450px]">
         {loading ? (
-          Array.from({ length: 12 }).map((_, i) => (
+          Array.from({ length: 8 }).map((_, i) => (
             <div
               key={i}
-              className="animate-pulse bg-gray-200 h-64 rounded-lg"
+              className="animate-pulse bg-gray-200 h-64 rounded-xl"
             />
           ))
         ) : fotos.length > 0 ? (
           fotos.map((foto) => (
             <div
               key={foto.public_id}
-              className="group bg-white rounded-xl overflow-hidden shadow-sm border border-gray-100"
+              className="group bg-white rounded-xl overflow-hidden shadow-sm border border-gray-100 hover:shadow-md transition-shadow"
             >
               <div className="relative h-48 md:h-56 w-full">
                 <Image
@@ -167,48 +171,49 @@ export default function GaleriaAlunos() {
                   alt={foto.filename || "Recurso"}
                   fill
                   sizes="(max-width: 768px) 50vw, 25vw"
-                  className="object-cover"
+                  className="object-cover transition-transform duration-300 group-hover:scale-105"
                 />
               </div>
               <div className="p-4">
                 <button
                   onClick={() => handleDownload(foto.secure_url)}
-                  className="w-full bg-gray-900 hover:bg-blue-600 text-white font-semibold py-2.5 rounded-lg text-sm transition-colors"
+                  className="w-full bg-slate-900 hover:bg-blue-600 text-white font-bold py-2.5 rounded-lg text-xs md:text-sm transition-colors uppercase tracking-wider"
                 >
-                  Baixar Original
+                  Download PNG
                 </button>
               </div>
             </div>
           ))
         ) : (
-          <div className="col-span-full text-center py-20">
-            Nenhuma imagem encontrada.
+          <div className="col-span-full text-center py-20 text-gray-400 border-2 border-dashed border-gray-100 rounded-2xl">
+            Nenhuma imagem encontrada nesta pasta.
           </div>
         )}
       </div>
 
-      {/* Botões de Paginação */}
-      <div className="flex justify-center items-center gap-4 mt-12 mb-30">
+      {/* Paginação */}
+      <div className="flex justify-center items-center gap-6 mt-16 mb-20">
         <button
           onClick={handlePrevPage}
           disabled={currentIndex === 0 || loading}
-          className="px-6 py-2 rounded-lg font-bold border border-gray-300 disabled:opacity-30 hover:bg-gray-50 transition-all"
+          className="px-6 py-2 rounded-lg font-bold border border-gray-300 text-gray-600 disabled:opacity-20 hover:bg-gray-50 transition-all"
         >
           ← Anterior
         </button>
 
-        <span className="text-sm font-medium text-gray-500">
-          Página {currentIndex + 1}
+        <span className="text-sm font-bold text-gray-400">
+          {currentIndex + 1}
         </span>
 
         <button
           onClick={handleNextPage}
           disabled={!nextCursor || loading}
-          className="px-6 py-2 rounded-lg font-bold bg-gray-900 text-white disabled:bg-gray-300 hover:bg-blue-600 transition-all"
+          className="px-6 py-2 rounded-lg font-bold bg-slate-900 text-white disabled:bg-gray-200 hover:bg-blue-600 transition-all shadow-sm"
         >
           Próxima →
         </button>
       </div>
+
       <Footer />
     </div>
   );
