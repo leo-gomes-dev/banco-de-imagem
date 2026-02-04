@@ -23,7 +23,6 @@ const CATEGORIAS = [
   "binóculos",
   "casal-familia",
   "celebridade",
-  "celular",
   "cerveja",
   "cocacola",
   "colete",
