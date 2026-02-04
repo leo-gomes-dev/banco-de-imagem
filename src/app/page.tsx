@@ -26,7 +26,6 @@ const CATEGORIAS = [
   "crianças",
   "doces",
   "esporte",
-  "fantasia",
   "fitness",
   "flor",
   "frango",
