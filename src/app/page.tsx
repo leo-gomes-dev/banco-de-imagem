@@ -11,10 +11,10 @@ interface CloudinaryPhoto {
 }
 
 const CATEGORIAS = [
+  "all",
   "açai",
   "agua",
   "alimentos",
-  "all",
   "animais",
   "automovel",
   "backgrounds",
