@@ -7,6 +7,13 @@ cloudinary.config({
   api_secret: process.env.CLOUDINARY_API_SECRET,
 });
 
+interface CloudinaryResource {
+  public_id: string;
+  secure_url: string;
+  filename: string;
+  [key: string]: unknown; // Permite outras propriedades que o Cloudinary envia
+}
+
 export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url);
@@ -26,9 +33,19 @@ export async function GET(request: NextRequest) {
       .next_cursor(cursor || undefined) // O segredo da paginação está aqui
       .execute();
 
-    // RETORNO OBRIGATÓRIO PARA O FRONTEND FUNCIONAR:
+    const optimizedResources = results.resources.map(
+      (file: CloudinaryResource) => ({
+        ...file,
+        // Agora o TS sabe que secure_url existe e é uma string
+        secure_url: file.secure_url.replace(
+          "/upload/",
+          "/upload/f_auto,q_auto/",
+        ),
+      }),
+    );
+
     return NextResponse.json({
-      resources: results.resources,
+      resources: optimizedResources,
       next_cursor: results.next_cursor || null,
     });
   } catch (error) {
