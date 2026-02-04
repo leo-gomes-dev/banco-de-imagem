@@ -52,6 +52,8 @@ export default function GaleriaAlunos() {
   const [fotos, setFotos] = useState<CloudinaryPhoto[]>([]);
   const [categoria, setCategoria] = useState("all");
   const [loading, setLoading] = useState(true);
+  const [fotoSelecionada, setFotoSelecionada] =
+    useState<CloudinaryPhoto | null>(null);
 
   const [nextCursor, setNextCursor] = useState<string | null>(null);
   const [cursorHistory, setCursorHistory] = useState<(string | null)[]>([]);
@@ -62,10 +64,8 @@ export default function GaleriaAlunos() {
     try {
       const baseUrl = `/api/photos?tag=${categoria}`;
       const url = cursor ? `${baseUrl}&cursor=${cursor}` : baseUrl;
-
       const res = await fetch(url);
       const data = await res.json();
-
       setFotos(Array.isArray(data.resources) ? data.resources : []);
       setNextCursor(data.next_cursor || null);
     } catch (err) {
@@ -84,6 +84,12 @@ export default function GaleriaAlunos() {
     setCurrentIndex(0);
     carregarImagens(null);
   }, [categoria]);
+
+  // Bloquear scroll do fundo quando o modal abrir
+  useEffect(() => {
+    if (fotoSelecionada) document.body.style.overflow = "hidden";
+    else document.body.style.overflow = "unset";
+  }, [fotoSelecionada]);
 
   const handleNextPage = () => {
     if (nextCursor) {
@@ -108,9 +114,6 @@ export default function GaleriaAlunos() {
   };
 
   const handleDownload = (url: string) => {
-    // 1. Remove otimizações de visualização para pegar o arquivo real
-    // 2. Converte a extensão para .png via URL do Cloudinary
-    // 3. Adiciona fl_attachment para forçar o download direto
     const downloadUrl = url
       .replace("/f_auto,q_auto/", "/")
       .replace(/\.[^/.]+$/, ".png")
@@ -133,7 +136,7 @@ export default function GaleriaAlunos() {
         <p className="text-gray-500 text-sm">Página {currentIndex + 1}</p>
       </header>
 
-      {/* Navegação de Categorias */}
+      {/* Categorias */}
       <div className="flex gap-2 overflow-x-auto pb-6 mb-8 scrollbar-hide">
         {CATEGORIAS.map((cat) => (
           <button
@@ -142,7 +145,7 @@ export default function GaleriaAlunos() {
             className={`px-5 py-2 rounded-full capitalize whitespace-nowrap text-sm font-medium transition-all ${
               categoria === cat
                 ? "bg-blue-600 text-white shadow-md"
-                : "bg-white text-gray-500 border border-gray-200 hover:border-blue-300"
+                : "bg-white text-gray-500 border border-gray-200"
             }`}
           >
             {cat}
@@ -150,7 +153,7 @@ export default function GaleriaAlunos() {
         ))}
       </div>
 
-      {/* Grid de Imagens */}
+      {/* Grid */}
       <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 min-h-[450px]">
         {loading ? (
           Array.from({ length: 8 }).map((_, i) => (
@@ -163,21 +166,24 @@ export default function GaleriaAlunos() {
           fotos.map((foto) => (
             <div
               key={foto.public_id}
-              className="group bg-white rounded-xl overflow-hidden shadow-sm border border-gray-100 hover:shadow-md transition-shadow"
+              className="group bg-white rounded-xl overflow-hidden shadow-sm border border-gray-100 transition-all"
             >
-              <div className="relative h-48 md:h-56 w-full">
+              <div
+                className="relative h-48 md:h-56 w-full cursor-zoom-in overflow-hidden"
+                onClick={() => setFotoSelecionada(foto)}
+              >
                 <Image
                   src={foto.secure_url}
                   alt={foto.filename || "Recurso"}
                   fill
                   sizes="(max-width: 768px) 50vw, 25vw"
-                  className="object-cover transition-transform duration-300 group-hover:scale-105"
+                  className="object-cover transition-transform duration-500 group-hover:scale-110"
                 />
               </div>
               <div className="p-4">
                 <button
                   onClick={() => handleDownload(foto.secure_url)}
-                  className="w-full bg-slate-900 hover:bg-blue-600 text-white font-bold py-2.5 rounded-lg text-xs md:text-sm transition-colors uppercase tracking-wider"
+                  className="w-full bg-slate-900 hover:bg-blue-600 text-white font-bold py-2.5 rounded-lg text-xs md:text-sm uppercase tracking-wider transition-colors"
                 >
                   Download PNG
                 </button>
@@ -186,7 +192,7 @@ export default function GaleriaAlunos() {
           ))
         ) : (
           <div className="col-span-full text-center py-20 text-gray-400 border-2 border-dashed border-gray-100 rounded-2xl">
-            Nenhuma imagem encontrada nesta pasta.
+            Nenhuma imagem encontrada.
           </div>
         )}
       </div>
@@ -200,11 +206,9 @@ export default function GaleriaAlunos() {
         >
           ← Anterior
         </button>
-
         <span className="text-sm font-bold text-gray-400">
           {currentIndex + 1}
         </span>
-
         <button
           onClick={handleNextPage}
           disabled={!nextCursor || loading}
@@ -213,6 +217,53 @@ export default function GaleriaAlunos() {
           Próxima →
         </button>
       </div>
+
+      {/* MODAL DE PREVIEW */}
+      {fotoSelecionada && (
+        <div
+          className="fixed inset-0 z-[100] flex items-center justify-center bg-black/90 p-4 backdrop-blur-sm animate-in fade-in duration-300"
+          onClick={() => setFotoSelecionada(null)}
+        >
+          <button className="absolute top-5 right-5 text-white hover:text-blue-400 transition-colors">
+            <svg
+              xmlns="http://www.w3.org"
+              width="32"
+              height="32"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            >
+              <line x1="18" y1="6" x2="6" y2="18"></line>
+              <line x1="6" y1="6" x2="18" y2="18"></line>
+            </svg>
+          </button>
+
+          <div
+            className="relative max-w-5xl max-h-[85vh] w-full h-full flex flex-col items-center justify-center gap-4"
+            onClick={(e) => e.stopPropagation()} // Impede fechar ao clicar na imagem
+          >
+            <div className="relative w-full h-full">
+              <Image
+                src={fotoSelecionada.secure_url.replace("/f_auto,q_auto/", "/")}
+                alt="Preview"
+                fill
+                className="object-contain rounded-lg shadow-2xl"
+                priority
+              />
+            </div>
+
+            <button
+              onClick={() => handleDownload(fotoSelecionada.secure_url)}
+              className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-4 px-10 rounded-full shadow-xl transition-all hover:scale-105"
+            >
+              Baixar Versão PNG
+            </button>
+          </div>
+        </div>
+      )}
 
       <Footer />
     </div>
