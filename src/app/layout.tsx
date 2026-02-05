@@ -1,7 +1,6 @@
 import "./globals.css";
-import Footer from "../components/Footer"; // Ajuste o caminho conforme necessário
+import Footer from "../components/Footer";
 
-// app/layout.tsx
 export default function RootLayout({
   children,
 }: {
@@ -9,10 +8,21 @@ export default function RootLayout({
 }) {
   return (
     <html lang="pt-br" className="dark">
-      <body className="bg-[#0a0a0a] text-[#f5f5f5] flex flex-col min-h-screen">
-        <main className="flex-grow">{children}</main>
+      <head>
+        {/* Anti-Flash: Força a cor de fundo no carregamento inicial */}
+        <meta name="theme-color" content="#18181b" />
+      </head>
+      {/* 
+          flex flex-col + min-h-screen: Empurra o footer para o final.
+          m-0 p-0: Remove espaços que criam a "faixa preta".
+      */}
+      <body className="bg-[#18181b] text-white flex flex-col min-h-screen m-0 p-0">
+        {/* O flex-grow faz o conteúdo principal "esticar" até o footer */}
+        <main className="flex-grow w-full">{children}</main>
+
+        {/* Footer integrado no fluxo, sem gap e sem bordas gritantes */}
+        <Footer />
       </body>
-      <Footer />
     </html>
   );
 }

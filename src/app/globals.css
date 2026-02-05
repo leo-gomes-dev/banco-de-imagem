@@ -1,37 +1,59 @@
 @import "tailwindcss";
+
+/* 1. Faz o Tailwind v4 escanear todas as suas pastas */
 @source "../**/*.{ts,tsx}";
 
+/* 2. Configurações de Tema Nativo do Navegador */
 :root {
   color-scheme: dark;
+  --background: #18181b;
+  --foreground: #ffffff;
 }
 
 @layer base {
+  /* Reset radical para evitar fundos brancos residuais */
   html,
   body {
-    /* Preto Absoluto para não ter erro de tom */
-    background-color: #000000 !important;
-    color: #ffffff;
+    background-color: #18181b !important;
+    color: #ffffff !important;
     margin: 0;
     padding: 0;
+    min-height: 100vh;
+    -webkit-font-smoothing: antialiased;
   }
 
-  /* Remove qualquer espaço entre elementos */
+  /* Garante que o container principal também seja escuro */
   main {
-    display: block;
-    background-color: #000000 !important;
+    background-color: #18181b !important;
   }
-}
 
-/* Cursor e Botões */
-@layer base {
+  /* Cursor Pointer Global em elementos clicáveis */
   button,
+  [button],
+  input[type="button"],
+  input[type="submit"],
   .cursor-pointer {
     cursor: pointer !important;
   }
+
+  button:disabled {
+    cursor: not-allowed !important;
+    opacity: 0.3;
+  }
 }
 
-/* Estilo dos Cards (Contraste com o fundo preto) */
-.bg-zinc-card {
-  background-color: #09090b !important;
-  border: 1px solid #18181b !important;
+/* 3. Ajuste para Skeletons e Cards (Glassmorphism Escuro) */
+.animate-pulse {
+  background-color: rgba(
+    39,
+    39,
+    42,
+    0.5
+  ) !important; /* zinc-800 com transparência */
+}
+
+/* Remove brilhos indesejados de foco em inputs */
+input:focus {
+  outline: none;
+  box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.3); /* Brilho azul suave */
 }

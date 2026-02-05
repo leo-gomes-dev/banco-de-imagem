@@ -1,11 +1,9 @@
 "use client";
 import { useState, useEffect } from "react";
-// Na raiz, usamos apenas um "../" para acessar as pastas irmãs da "app"
 import { SearchHeader } from "../components/SearchHeader";
 import { ImageCard } from "../components/ImageCard";
 import { PhotoModal } from "../components/PhotoModal";
 
-// Interface para eliminar o erro de 'any' e garantir tipos consistentes
 interface CloudinaryPhoto {
   public_id: string;
   secure_url: string;
@@ -13,14 +11,12 @@ interface CloudinaryPhoto {
 }
 
 export default function GaleriaAlunos() {
-  // Estados tipados corretamente
   const [fotos, setFotos] = useState<CloudinaryPhoto[]>([]);
   const [categoria, setCategoria] = useState<string>("all");
   const [loading, setLoading] = useState<boolean>(true);
   const [fotoSelecionada, setFotoSelecionada] =
     useState<CloudinaryPhoto | null>(null);
 
-  // Estados de Paginação
   const [nextCursor, setNextCursor] = useState<string | null>(null);
   const [cursorHistory, setCursorHistory] = useState<(string | null)[]>([]);
   const [currentIndex, setCurrentIndex] = useState<number>(0);
@@ -32,7 +28,6 @@ export default function GaleriaAlunos() {
       const url = cursor ? `${baseUrl}&cursor=${cursor}` : baseUrl;
       const res = await fetch(url);
       const data = await res.json();
-
       setFotos(Array.isArray(data.resources) ? data.resources : []);
       setNextCursor(data.next_cursor || null);
     } catch (err) {
@@ -45,14 +40,12 @@ export default function GaleriaAlunos() {
     }
   };
 
-  // Reset ao mudar categoria
   useEffect(() => {
     setCursorHistory([]);
     setCurrentIndex(0);
     carregarImagens(null);
   }, [categoria]);
 
-  // Funções de Navegação
   const handleNextPage = () => {
     if (nextCursor) {
       setCursorHistory((prev) => [
@@ -78,7 +71,6 @@ export default function GaleriaAlunos() {
       .replace("/f_auto,q_auto/", "/")
       .replace(/\.[^/.]+$/, ".png")
       .replace("/upload/", "/upload/fl_attachment/");
-
     const link = document.createElement("a");
     link.href = downloadUrl;
     link.setAttribute("download", `recurso-${Date.now()}.png`);
@@ -88,7 +80,8 @@ export default function GaleriaAlunos() {
   };
 
   return (
-    <div className="min-h-screen bg-white flex flex-col font-sans">
+    /* CORREÇÃO AQUI: Mudado de bg-white para bg-[#18181b] */
+    <div className="min-h-screen bg-[#18181b] text-white flex flex-col font-sans">
       <div className="max-w-7xl mx-auto p-4 sm:p-8 w-full flex-grow">
         <SearchHeader
           categoria={categoria}
@@ -99,9 +92,10 @@ export default function GaleriaAlunos() {
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 min-h-[450px]">
           {loading ? (
             Array.from({ length: 8 }).map((_, i) => (
+              /* CORREÇÃO: Skeleton agora é escuro */
               <div
                 key={`skeleton-${i}`}
-                className="animate-pulse bg-gray-100 h-64 rounded-xl shadow-inner"
+                className="animate-pulse bg-zinc-800/50 h-64 rounded-xl shadow-inner"
               />
             ))
           ) : fotos.length > 0 ? (
@@ -114,9 +108,9 @@ export default function GaleriaAlunos() {
               />
             ))
           ) : (
-            <div className="col-span-full text-center py-32 text-gray-400 border-2 border-dashed border-gray-100 rounded-3xl">
+            <div className="col-span-full text-center py-32 text-zinc-500 border-2 border-dashed border-zinc-800 rounded-3xl">
               Nenhuma imagem encontrada em{" "}
-              <span className="font-bold text-blue-600 uppercase tracking-tighter">
+              <span className="font-bold text-blue-500 uppercase tracking-tighter">
                 {categoria}
               </span>
               .
@@ -124,21 +118,22 @@ export default function GaleriaAlunos() {
           )}
         </div>
 
+        {/* PAGINAÇÃO: Cores ajustadas para o Dark Mode */}
         <div className="flex justify-center items-center gap-8 mt-20 mb-10">
           <button
             onClick={handlePrevPage}
             disabled={currentIndex === 0 || loading}
-            className="text-[10px] font-bold uppercase tracking-[0.2em] text-gray-400 hover:text-black disabled:opacity-20 transition-all"
+            className="text-[10px] font-bold uppercase tracking-[0.2em] text-zinc-500 hover:text-white disabled:opacity-20 transition-all"
           >
             ← Voltar
           </button>
-          <span className="text-[10px] font-black bg-gray-50 px-3 py-1 rounded text-gray-400">
+          <span className="text-[10px] font-black bg-zinc-900 px-3 py-1 rounded text-zinc-400 border border-zinc-800">
             {currentIndex + 1}
           </span>
           <button
             onClick={handleNextPage}
             disabled={!nextCursor || loading}
-            className="text-[10px] font-bold uppercase tracking-[0.2em] text-gray-400 hover:text-black disabled:opacity-20 transition-all"
+            className="text-[10px] font-bold uppercase tracking-[0.2em] text-zinc-500 hover:text-white disabled:opacity-20 transition-all"
           >
             Avançar →
           </button>
