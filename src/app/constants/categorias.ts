@@ -10,6 +10,7 @@ export const CATEGORIAS = [
   "batata",
   "bebidas",
   "binóculos",
+  "caixa",
   "casal-familia",
   "celebridade",
   "celular",
