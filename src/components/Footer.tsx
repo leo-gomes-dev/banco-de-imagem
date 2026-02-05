@@ -2,37 +2,38 @@ export default function Footer() {
   const currentYear = new Date().getFullYear();
 
   return (
-    <footer className="w-full py-12 mt-20 border-t border-gray-100 bg-transparent">
-      <div className="max-w-4xl mx-auto px-4 flex flex-col items-center">
-        {/* Seção Café Minimalista */}
-        <div className="text-center mb-8">
-          <p className="text-sm font-medium text-gray-600">
-            Gostou do projeto?
-          </p>
-          <p className="text-xs text-gray-400 mt-1">
-            Se este trabalho te ajudou, considere me pagar um café. ☕
-          </p>
-          <a
-            href="https://www.mercadopago.com.br"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="mt-3 inline-block text-xs font-semibold text-gray-500 hover:text-gray-800 underline underline-offset-4 transition-colors"
-          >
-            Me paga um café?
-          </a>
-        </div>
+    <footer className="w-full  border-t border-zinc-800/50 bg-[#18181B]">
+      <div className="max-w-4xl mx-auto px-4 text-center">
+        {/* Texto de apoio minimalista */}
+        <p className="text-[10px] mt-15  text-zinc-500 font-bold uppercase tracking-[0.3em] mb-4">
+          Gostou do projeto?
+        </p>
 
-        {/* Créditos */}
-        <div className="flex flex-col sm:flex-row items-center gap-2 text-[11px] uppercase tracking-wider text-gray-400">
-          <span>© {currentYear} — Todos os direitos reservados</span>
-          <span className="hidden sm:block">|</span>
-          <div className="flex items-center gap-1">
-            <span>By</span>
+        {/* Link do Café com cor azul vibrante para destaque */}
+        <a
+          href="https://www.mercadopago.com.br"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="text-xs text-blue-500 hover:text-blue-400 underline underline-offset-8 transition-all font-medium"
+        >
+          Me paga um café? ☕
+        </a>
+
+        {/* Créditos e Copyright */}
+        <div className="mt-12 flex flex-col items-center gap-2">
+          <div className="text-[9px] text-zinc-600 uppercase tracking-[0.2em] flex items-center gap-1">
+            <span>© {currentYear}</span>
+            <span className="text-zinc-800">—</span>
+            <span>Todos os direitos reservados</span>
+          </div>
+
+          <div className="text-[10px] mb-16  text-zinc-500 uppercase tracking-widest">
+            <span className="font-light">By </span>
             <a
               href="https://leogomesdev.com"
               target="_blank"
               rel="noopener noreferrer"
-              className="hover:text-gray-600 transition-colors duration-200"
+              className="font-black text-zinc-400 hover:text-white transition-colors tracking-tighter"
             >
               Leo Gomes Developer
             </a>

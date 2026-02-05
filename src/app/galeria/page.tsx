@@ -1,12 +1,13 @@
 "use client";
 
 import { useState, useEffect } from "react";
-// Na raiz, usamos apenas um "../" para acessar as pastas irmãs da "app"
-import { SearchHeader } from "../components/SearchHeader";
-import { ImageCard } from "../components/ImageCard";
-import { PhotoModal } from "../components/PhotoModal";
+// Subindo dois níveis para encontrar as pastas na raiz do projeto
+import { SearchHeader } from "../../components/SearchHeader";
+import { ImageCard } from "../../components/ImageCard";
+import { PhotoModal } from "../../components/PhotoModal";
+import Footer from "../../components/Footer";
 
-// Interface para eliminar o erro de 'any' e garantir tipos consistentes
+// Interface para garantir a tipagem correta
 interface CloudinaryPhoto {
   public_id: string;
   secure_url: string;
@@ -14,21 +15,23 @@ interface CloudinaryPhoto {
 }
 
 export default function GaleriaAlunos() {
-  // Estados tipados corretamente
+  // --- Estados de Dados ---
   const [fotos, setFotos] = useState<CloudinaryPhoto[]>([]);
   const [categoria, setCategoria] = useState<string>("all");
   const [loading, setLoading] = useState<boolean>(true);
   const [fotoSelecionada, setFotoSelecionada] =
     useState<CloudinaryPhoto | null>(null);
 
-  // Estados de Paginação
+  // --- Estados de Paginação ---
   const [nextCursor, setNextCursor] = useState<string | null>(null);
   const [cursorHistory, setCursorHistory] = useState<(string | null)[]>([]);
   const [currentIndex, setCurrentIndex] = useState<number>(0);
 
+  // --- Lógica de Fetch ---
   const carregarImagens = async (cursor: string | null = null) => {
     setLoading(true);
     try {
+      // Uso de encodeURIComponent para evitar erro em tags com espaços ou acentos
       const baseUrl = `/api/photos?tag=${encodeURIComponent(categoria)}`;
       const url = cursor ? `${baseUrl}&cursor=${cursor}` : baseUrl;
       const res = await fetch(url);
@@ -41,19 +44,20 @@ export default function GaleriaAlunos() {
       setFotos([]);
     } finally {
       setLoading(false);
-      if (typeof window !== "undefined")
+      if (typeof window !== "undefined") {
         window.scrollTo({ top: 0, behavior: "smooth" });
+      }
     }
   };
 
-  // Reset ao mudar categoria
+  // Reset total ao mudar de categoria
   useEffect(() => {
     setCursorHistory([]);
     setCurrentIndex(0);
     carregarImagens(null);
   }, [categoria]);
 
-  // Funções de Navegação
+  // --- Handlers de Paginação ---
   const handleNextPage = () => {
     if (nextCursor) {
       setCursorHistory((prev) => [
@@ -68,12 +72,15 @@ export default function GaleriaAlunos() {
   const handlePrevPage = () => {
     if (currentIndex > 0) {
       const prevCursor = cursorHistory[currentIndex - 1];
-      setCursorHistory((prev) => prev.slice(0, -1));
+      const newHistory = [...cursorHistory];
+      newHistory.pop();
+      setCursorHistory(newHistory);
       setCurrentIndex((prev) => prev - 1);
       carregarImagens(prevCursor);
     }
   };
 
+  // --- Lógica de Download ---
   const handleDownload = (url: string) => {
     const downloadUrl = url
       .replace("/f_auto,q_auto/", "/")
@@ -115,12 +122,11 @@ export default function GaleriaAlunos() {
               />
             ))
           ) : (
-            <div className="col-span-full text-center py-32 text-gray-400 border-2 border-dashed border-gray-100 rounded-3xl">
-              Nenhuma imagem encontrada em{" "}
-              <span className="font-bold text-blue-600 uppercase tracking-tighter">
-                {categoria}
-              </span>
-              .
+            <div className="col-span-full py-32 text-center text-gray-400 border-2 border-dashed border-gray-100 rounded-3xl">
+              <p className="text-sm font-medium uppercase tracking-widest">
+                Nenhuma imagem encontrada em{" "}
+                <span className="text-blue-500 font-bold">{categoria}</span>
+              </p>
             </div>
           )}
         </div>
@@ -129,19 +135,25 @@ export default function GaleriaAlunos() {
           <button
             onClick={handlePrevPage}
             disabled={currentIndex === 0 || loading}
-            className="text-[10px] font-bold uppercase tracking-[0.2em] text-gray-400 hover:text-black disabled:opacity-20 transition-all"
+            className="text-[10px] font-black uppercase tracking-[0.2em] text-gray-400 hover:text-blue-600 disabled:opacity-10 transition-all"
           >
-            ← Voltar
+            ← Anterior
           </button>
-          <span className="text-[10px] font-black bg-gray-50 px-3 py-1 rounded text-gray-400">
-            {currentIndex + 1}
-          </span>
+
+          <div className="flex items-center gap-2">
+            <span className="h-px w-8 bg-gray-200"></span>
+            <span className="text-xs font-black text-gray-300">
+              {currentIndex + 1}
+            </span>
+            <span className="h-px w-8 bg-gray-200"></span>
+          </div>
+
           <button
             onClick={handleNextPage}
             disabled={!nextCursor || loading}
-            className="text-[10px] font-bold uppercase tracking-[0.2em] text-gray-400 hover:text-black disabled:opacity-20 transition-all"
+            className="text-[10px] font-black uppercase tracking-[0.2em] text-gray-400 hover:text-blue-600 disabled:opacity-10 transition-all"
           >
-            Avançar →
+            Próxima →
           </button>
         </div>
       </div>
@@ -153,6 +165,8 @@ export default function GaleriaAlunos() {
           onDownload={handleDownload}
         />
       )}
+
+      <Footer />
     </div>
   );
 }

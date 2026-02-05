@@ -1,26 +1,37 @@
 @import "tailwindcss";
+@source "../**/*.{ts,tsx}";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  color-scheme: dark;
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
+@layer base {
+  html,
+  body {
+    /* Preto Absoluto para não ter erro de tom */
+    background-color: #000000 !important;
+    color: #ffffff;
+    margin: 0;
+    padding: 0;
+  }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+  /* Remove qualquer espaço entre elementos */
+  main {
+    display: block;
+    background-color: #000000 !important;
   }
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+/* Cursor e Botões */
+@layer base {
+  button,
+  .cursor-pointer {
+    cursor: pointer !important;
+  }
+}
+
+/* Estilo dos Cards (Contraste com o fundo preto) */
+.bg-zinc-card {
+  background-color: #09090b !important;
+  border: 1px solid #18181b !important;
 }
