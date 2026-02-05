@@ -33,7 +33,6 @@ export const CATEGORIAS = [
   "lua",
   "modelo",
   "monstro",
-  "munição",
   "natal",
   "natureza",
   "negócios",
