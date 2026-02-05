@@ -1,5 +1,4 @@
 "use client";
-
 import { useState, useEffect } from "react";
 // Na raiz, usamos apenas um "../" para acessar as pastas irmãs da "app"
 import { SearchHeader } from "../components/SearchHeader";
