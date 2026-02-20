@@ -2,6 +2,7 @@ export const CATEGORIAS = [
   "all",
   "açai",
   "agua",
+  "aleatorio",
   "animais",
   "automovel",
   "avatar",
