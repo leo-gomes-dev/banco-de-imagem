@@ -1,37 +1,92 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# 📸 Cloudinary Media Bank - Next.js App
 
-## Getting Started
+![Next.js](https://img.shields.io/badge/Next.js-000000?style=for-the-badge&logo=nextdotjs&logoColor=white) ![TypeScript](https://img.shields.io/badge/TypeScript-3178C6?style=for-the-badge&logo=typescript&logoColor=white) ![Tailwind%20CSS](https://img.shields.io/badge/Tailwind_CSS-06B6D4?style=for-the-badge&logo=tailwindcss&logoColor=white) ![Cloudinary](https://img.shields.io/badge/Cloudinary-3448C5?style=for-the-badge&logo=cloudinary&logoColor=white)
 
-First, run the development server:
+Um aplicativo de banco de imagens de alta performance e interface escura customizada, desenvolvido com **Next.js** e **TypeScript**. O projeto consome recursos de mídia diretamente da API do **Cloudinary**, garantindo compressão automática, carregamento sob demanda (*lazy-loading*) e otimização visual responsiva com suporte do framework Tailwind CSS.
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+---
+
+## ✨ Funcionalidades Principais
+
+- **🌌 Tema Dark Customizado:** Interface polida com design escuro focado na experiência do usuário (UI/UX) para exibição de mídias de forma elegante.
+- **☁️ Cloudinary Sync:** Galeria alimentada dinamicamente por uma API externa ou SDK nativo do Cloudinary para armazenamento e distribuição de imagens via CDN.
+- **⚡ Performance Otimizada:** Uso intensivo de componentes e hooks estruturados do ecossistema Next.js para renderização rápida do lado do servidor ou do cliente.
+- **📱 Layout Fluido:** Organização em categorias e grades dinâmicas criadas com Tailwind CSS para se adaptar perfeitamente a dispositivos móveis e desktops.
+
+---
+
+## 🛠️ Variáveis de Ambiente Necessárias
+
+Para que a conexão com o Cloudinary funcione corretamente, você deve criar um arquivo `.env.local` na raiz do seu projeto e preenchê-lo com as suas credenciais obtidas no painel do Cloudinary:
+
+```env
+NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME=seu_cloud_name
+NEXT_PUBLIC_CLOUDINARY_API_KEY=sua_api_key
+CLOUDINARY_API_SECRET=seu_api_secret
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+---
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## 🎮 Como Executar o Projeto Localmente
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+1. Clone o repositório em sua máquina:
+   ```bash
+   git clone https://github.com
+   ```
+2. Acesse o diretório do projeto:
+   ```bash
+   cd aleatorio
+   ```
+3. Instale todas as dependências necessárias:
+   ```bash
+   npm install
+   # ou yarn install / pnpm install / bun install
+   ```
+4. Inicie o servidor de desenvolvimento:
+   ```bash
+   npm run dev
+   ```
+5. Abra o navegador e acesse a aplicação em [http://localhost:3000](http://localhost:3000).
 
-## Learn More
+---
 
-To learn more about Next.js, take a look at the following resources:
+## 📂 Estrutura de Pastas Essenciais
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+A arquitetura interna segue o padrão recomendado do Next.js moderno:
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+```text
+├── public/                # Arquivos estáticos locais (ex: favicons, ícones base)
+├── src/
+│   ├── app/              # Estrutura de roteamento de páginas (App Router)
+│   │   ├── page.tsx      # Página principal do banco de imagens
+│   │   └── layout.tsx    # Layout global do app e fontes aplicadas
+│   ├── styles/
+│   │   └── style.css     # Arquivo de estilos importados
+├── next.config.ts        # Permissões de domínios externos de imagens (Cloudinary)
+├── tailwind.config.ts    # Configuração e paleta de cores customizada do Tailwind
+└── tsconfig.json         # Mapeamentos e regras estritas do TypeScript
+```
 
-## Deploy on Vercel
+---
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## 🔒 Configuração do Next Image
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
-# banco-de-imagem
+Lembre-se de que, para carregar imagens externas no Next.js usando o componente `<Image />`, o domínio do Cloudinary deve estar explicitamente liberado no seu arquivo `next.config.ts`:
+
+```typescript
+import type { NextConfig } from "next";
+
+const nextConfig: NextConfig = {
+  images: {
+    remotePatterns: [
+      {
+        protocol: "https",
+        hostname: "://cloudinary.com",
+        pathname: "/**",
+      },
+    ],
+  },
+};
+
+export default nextConfig;
+```
